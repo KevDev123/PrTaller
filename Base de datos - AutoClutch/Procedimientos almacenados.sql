@@ -802,6 +802,8 @@ end $$
 DELIMITER ;
 
 
+
+
 -- Procedimiento para actualizar las reparaciones
 delimiter $$
 
@@ -1141,3 +1143,285 @@ begin
     end if;
 end $$
 DELIMITER ;
+
+-- PROCEDIMIENTOS ALMACENADOS PARA FILTRO DE DATOS
+delimiter $$
+
+-- Filtrado de clientes
+create procedure filtradoClientes(
+    in filtro varchar(50),
+    in tipUsuario varchar(20)
+)
+begin
+    declare validacion varchar(20) default '';
+
+    -- declarar el handler para manejar errores de sql
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    begin
+        -- manejo de errores en caso de fallo
+        select 'error al filtrar' as mensaje;
+    end;
+
+    -- buscar el tipo de usuario
+    select tipoUsuario into validacion 
+    from usuarios
+    where tipoUsuario = tipUsuario;
+
+    -- verificar el tipo de usuario 
+    if validacion = 'secretaria' then
+        select * from clientes
+        where nombre like concat(filtro,'%');
+    elseif validacion = 'gerente' or validacion = 'admin' then
+        select * from descrypCliente
+        where nombre like concat(filtro,'%');
+    else
+        select 'usuario no autorizado o no existente' as mensaje;
+    end if;
+
+end$$
+
+delimiter ;
+
+-- Filtrado de empleados
+delimiter $$
+create procedure filtradoEmpleados(
+    in filtro varchar(50),
+    in tipUsuario varchar(20)
+)
+begin
+    declare validacion varchar(20) default '';
+
+    -- declarar el handler para manejar errores de sql
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    begin
+        -- manejo de errores en caso de fallo
+        select 'error al filtrar' as mensaje;
+    end;
+
+    -- buscar el tipo de usuario
+    select tipoUsuario into validacion 
+    from usuarios
+    where tipoUsuario = tipUsuario;
+
+    -- verificar el tipo de usuario 
+    if validacion = 'secretaria' then
+        select * from empleados
+        where nombre like concat(filtro,'%') or apellido like concat(filtro,'%');
+    elseif validacion = 'gerente' or validacion = 'admin' then
+        select * from descrypempleado
+        where nombre like concat(filtro,'%') or apellido like concat(filtro,'%');
+    else
+        select 'usuario no autorizado o no existente' as mensaje;
+    end if;
+
+end$$
+
+delimiter ;
+
+
+-- Filtrado de proveedores 
+delimiter $$
+create procedure filtradoProveedores(
+    in filtro varchar(50),
+    in tipUsuario varchar(20)
+)
+begin
+    declare validacion varchar(20) default '';
+
+    -- declarar el handler para manejar errores de sql
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    begin
+        -- manejo de errores en caso de fallo
+        select 'error al filtrar' as mensaje;
+    end;
+
+    -- buscar el tipo de usuario
+    select tipoUsuario into validacion 
+    from usuarios
+    where tipoUsuario = tipUsuario;
+
+    -- verificar el tipo de usuario 
+    if validacion = 'secretaria' then
+        select * from proveedores
+        where nombreContacto like concat(filtro,'%');
+    elseif validacion = 'gerente' or validacion = 'admin' then
+        select * from descrypproveedor
+        where nombreContacto like concat(filtro,'%');
+    else
+        select 'usuario no autorizado o no existente' as mensaje;
+    end if;
+
+end$$
+
+delimiter ;
+
+
+-- Filtrado de servicios 
+delimiter $$
+create procedure filtradoServicios(
+    in filtro varchar(50),
+    in tipUsuario varchar(20)
+)
+begin
+    declare validacion varchar(20) default '';
+
+    -- declarar el handler para manejar errores de sql
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    begin
+        -- manejo de errores en caso de fallo
+        select 'error al filtrar' as mensaje;
+    end;
+
+    -- buscar el tipo de usuario
+    select tipoUsuario into validacion 
+    from usuarios
+    where tipoUsuario = tipUsuario;
+
+    -- verificar el tipo de usuario 
+    if validacion in ('secretaria','gerente','admin') then
+        select * from servicios
+        where nombre like concat(filtro,'%');
+    else
+        select 'usuario no autorizado o no existente' as mensaje;
+    end if;
+
+end$$
+
+delimiter ;
+
+-- Filtrado de vehiculos
+delimiter $$
+create procedure filtradoVehiculos(
+    in filtro varchar(50),
+    in tipUsuario varchar(20)
+)
+begin
+    declare validacion varchar(20) default '';
+
+    -- declarar el handler para manejar errores de sql
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    begin
+        -- manejo de errores en caso de fallo
+        select 'error al filtrar' as mensaje;
+    end;
+
+    -- buscar el tipo de usuario
+    select tipoUsuario into validacion 
+    from usuarios
+    where tipoUsuario = tipUsuario;
+
+    -- verificar el tipo de usuario 
+    if validacion in ('secretaria','gerente','admin') then
+        select * from vehiculos
+        where filtro like concat(filtro,'%');
+    else
+        select 'usuario no autorizado o no existente' as mensaje;
+    end if;
+
+end$$
+
+delimiter ;
+
+
+-- Filtrado de productos
+delimiter $$
+create procedure filtradoProductos(
+    in filtro varchar(50),
+    in tipUsuario varchar(20)
+)
+begin
+    declare validacion varchar(20) default '';
+
+    -- declarar el handler para manejar errores de sql
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    begin
+        -- manejo de errores en caso de fallo
+        select 'error al filtrar' as mensaje;
+    end;
+
+    -- buscar el tipo de usuario
+    select tipoUsuario into validacion 
+    from usuarios
+    where tipoUsuario = tipUsuario;
+
+    -- verificar el tipo de usuario 
+    if validacion in ('secretaria','gerente','admin') then
+        select * from productos
+        where nombre like concat(filtro,'%');
+    else
+        select 'usuario no autorizado o no existente' as mensaje;
+    end if;
+
+end$$
+
+delimiter ;
+
+
+-- Filtrado de categorias
+delimiter $$
+create procedure filtradoCategorias(
+    in filtro varchar(50),
+    in tipUsuario varchar(20)
+)
+begin
+    declare validacion varchar(20) default '';
+
+    -- declarar el handler para manejar errores de sql
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    begin
+        -- manejo de errores en caso de fallo
+        select 'error al filtrar' as mensaje;
+    end;
+
+    -- buscar el tipo de usuario
+    select tipoUsuario into validacion 
+    from usuarios
+    where tipoUsuario = tipUsuario;
+
+    -- verificar el tipo de usuario 
+    if validacion in ('secretaria','gerente','admin') then
+        select * from categorias
+        where nombre like concat(filtro,'%');
+    else
+        select 'usuario no autorizado o no existente' as mensaje;
+    end if;
+
+end$$
+
+delimiter ;
+
+
+-- Filtrado de reparaciones
+delimiter $$
+create procedure filtradoReparaciones(
+    in filtro varchar(50),
+    in tipUsuario varchar(20)
+)
+begin
+    declare validacion varchar(20) default '';
+
+    -- declarar el handler para manejar errores de sql
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    begin
+        -- manejo de errores en caso de fallo
+        select 'error al filtrar' as mensaje;
+    end;
+
+    -- buscar el tipo de usuario
+    select tipoUsuario into validacion 
+    from usuarios
+    where tipoUsuario = tipUsuario;
+
+    -- verificar el tipo de usuario 
+    if validacion in ('secretaria','gerente','admin') then
+        select r.*,dt.idProducto,dt.CantidadUsada from reparaciones r
+        inner join detallereparacion dt on r.idReparacion = dt.idReparacion
+        where matricula like concat(filtro,'%') or idReparacion = convert(filtro, signed);
+    else
+        select 'usuario no autorizado o no existente' as mensaje;
+    end if;
+
+end$$
+
+delimiter ;
+
