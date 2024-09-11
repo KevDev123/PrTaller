@@ -78,3 +78,20 @@ begin
 end$$
 
 delimiter ;
+
+
+-- trigger para eliminar stock de productos
+DELIMITER $$
+
+create trigger menosStock
+after insert on detalleReparacion
+for each row
+begin
+   -- Actualizar el stock del producto utilizado en la reparación
+   update productos 
+   set stock = stock - new.CantidadUsada
+   where idProducto = new.idProducto;
+
+end$$
+
+DELIMITER ;

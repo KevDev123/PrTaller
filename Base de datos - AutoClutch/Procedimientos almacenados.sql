@@ -353,97 +353,112 @@ DELIMITER ;
 
 
 -- Procedimiento para ingresar reparaciones y detalleReparacion
-delimiter $$
-
-create procedure insert_reparacion (
+DELIMITER $$
+create procedure insert_reparacion(
     in v_matricula varchar(20),
-    in v_idServicio int,
-    in v_idEmpleado int,
-    in v_costo double,
-    in v_idProducto int,
-    in v_CantidadUsada int
+    in v_idservicio int,
+    in v_idempleado int,
+    in v_costomanoobra double,
+    in v_idproducto int,
+    in v_cantidadusada int
 )
 begin
     declare matricula_existente int default 0;
     declare servicio_existente int default 0;
     declare empleado_existente int default 0;
     declare producto_existente int default 0;
+    declare v_costoproducto double default 0;
+    declare v_costototal double default 0;
+    declare idreparacion int default 0;
+    declare producto_precio double default 0;
 
-    -- Declarar el handler para manejar errores de SQL
+    -- declarar el handler para manejar errores de sql
     declare exit handler for sqlexception
     begin
-        -- Manejo de errores y rollback en caso de falla
+        -- manejo de errores y rollback en caso de falla
         rollback;
-        select 'Error al insertar la reparacion' as mensaje;
+        select 'error al insertar la reparación' as mensaje;
     end;
 
-    -- Etiqueta de inicio del bloque
+    -- etiqueta de inicio del bloque
     etiqueta_proc: begin
 
-        -- Verificar que la matricula existe en la tabla de vehículos
+        -- verificar que la matrícula existe en la tabla de vehículos
         select count(*) into matricula_existente
         from vehiculos 
         where matricula = v_matricula;
 
         if matricula_existente = 0 then
-            select 'Error: la matricula no existe' as mensaje;
+            select 'error: la matrícula no existe' as mensaje;
             leave etiqueta_proc;
         end if;
 
-        -- Verificar que el servicio existe
+        -- verificar que el servicio existe
         select count(*) into servicio_existente
         from servicios 
-        where idServicio = v_idServicio;
+        where idservicio = v_idservicio;
 
         if servicio_existente = 0 then
-            select 'Error: el servicio no existe' as mensaje;
+            select 'error: el servicio no existe' as mensaje;
             leave etiqueta_proc;
         end if;
 
-        -- Verificar que el empleado existe
+        -- verificar que el empleado existe
         select count(*) into empleado_existente
         from empleados 
-        where idEmpleado = v_idEmpleado;
+        where idempleado = v_idempleado;
 
         if empleado_existente = 0 then
-            select 'Error: el empleado no existe' as mensaje;
+            select 'error: el empleado no existe' as mensaje;
             leave etiqueta_proc;
         end if;
 
-        -- Verificar que el producto existe
+        -- verificar que el producto existe
         select count(*) into producto_existente
         from productos 
-        where idProducto = v_idProducto;
+        where idproducto = v_idproducto;
 
         if producto_existente = 0 then
-            select 'Error: el producto no existe' as mensaje;
+            select 'error: el producto no existe' as mensaje;
             leave etiqueta_proc;
         end if;
 
-        -- Iniciar la transacción
+        -- obtener el precio del producto para calcular el costo total
+        select precio into producto_precio
+        from productos
+        where idproducto = v_idproducto;
+
+        -- calcular el costo del producto basado en la cantidad usada
+        set v_costoproducto = producto_precio * v_cantidadusada;
+
+        -- sumar el costo de mano de obra y el costo de productos
+        set v_costototal = v_costomanoobra + v_costoproducto;
+
+        -- iniciar la transacción
         start transaction;
 
-        -- Insertar la reparación en la tabla reparaciones
-        insert into reparaciones (matricula, idServicio, idEmpleado, fechaReparacion, costo)
-        values (v_matricula, v_idServicio, v_idEmpleado, now(), v_costo);
+        -- insertar la reparación en la tabla reparaciones con el costo total
+        insert into reparaciones (matricula, idservicio, idempleado, fechareparacion, costo)
+        values (v_matricula, v_idservicio, v_idempleado, now(), v_costototal);
 
-        -- Obtener el id de la reparación insertada
-        set @idReparacion = last_insert_id();
+        -- obtener el id de la reparación insertada
+        set idreparacion = last_insert_id();
 
-        -- Insertar el detalle de la reparación en la tabla detallesreparacion
-        insert into detallesreparacion (idReparacion, idProducto, CantidadUsada)
-        values (@idReparacion, v_idProducto, v_CantidadUsada);
+        -- insertar el detalle de la reparación en la tabla detallereparacion
+        insert into detallereparacion (idreparacion, idproducto, cantidadusada)
+        values (idreparacion, v_idproducto, v_cantidadusada);
 
-        -- Confirmar la transacción si todo es correcto
+        -- confirmar la transacción si todo es correcto
         commit;
 
-        select 'Reparacion ingresada correctamente' as mensaje;
+        select 'reparación ingresada correctamente' as mensaje;
 
     end etiqueta_proc;
 
-end $$
+end;
 
-delimiter ;
+DELIMITER;
+
 
 -- PROCEDIMIENTOS PARA UPDATE
 -- Procedimiento para actualizar un cliente
