@@ -1,6 +1,5 @@
 create schema AutoClutch;
 use AutoClutch;
-drop schema AutoClutch;
 
 create table clientes(
 idCliente int auto_increment primary key not null,
@@ -16,19 +15,19 @@ nombre varchar(30) not null,
 apellido varchar(30) not null,
 telefono varbinary(255) not null,
 fechaNacimiento date,
-Direccion varbinary(255) not null
+direccion varbinary(255) not null
 );
 
-create table Servicios(
+create table servicios(
 idServicio int auto_increment primary key not null,
-nombre varchar(50),
-Descripcion varchar(100)
+nombre varchar(50) not null,
+descripcion varchar(100) not null
 );
 
 create table categorias(
 idCategoria int auto_increment primary key not null,
-nombre varchar(30),
-Descripcion varchar(100)
+nombre varchar(30) not null,
+descripcion varchar(100) not null
 );
 
 
@@ -36,7 +35,7 @@ create table proveedores(
 idProveedor int auto_increment primary key not null,
 nombreContacto varchar(30) not null,
 telefono varbinary(255) not null,
-Direccion varbinary(255) not null
+direccion varbinary(255) not null
 );
 
 create table usuarios(
@@ -45,11 +44,12 @@ contra varbinary(100) not null,
 tipoUsuario varchar(20) not null
 );
 
+
 create table vehiculos(
 matricula varchar(20) primary key not null,
 idCliente int not null,
 marca varchar(20) not null,
-año nchar(4) not null,
+año int not null,
 modelo varchar(20) not null,
 descripcion varchar(50) not null,
 foreign key (idCliente) references clientes(idCliente)
@@ -93,7 +93,7 @@ on delete cascade
 create table detalleReparacion(
  idReparacion int not null,
  idProducto int not null,
- CantidadUsada int not null,
+ cantidadUsada int not null,
  primary key (idReparacion, idProducto),
  foreign key (idReparacion) references reparaciones(idReparacion)
  on update cascade

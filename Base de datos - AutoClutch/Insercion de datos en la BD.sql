@@ -12,7 +12,7 @@ values('Efrain','Gabriel','1234-5643','1993-02-02','Comunidad Rosa Virginia 1'),
 
 
 -- tabla servicios
-Insert into servicios (nombre, Descripcion)
+Insert into servicios (nombre, descripcion)
 values
 ('Cambio de aceite', 'Cambio completo de aceite para motor a gasolina'),
 ('Alineación y balanceo', 'Ajuste de la alineación y balanceo de las ruedas'),
@@ -26,7 +26,7 @@ values
 ('Mantenimiento del sistema de refrigeración', 'Revisión y limpieza del sistema de enfriamiento del motor');
 
 -- tabla de proveedores
-insert into proveedores (nombreContacto, telefono, Direccion)
+insert into proveedores (nombreContacto, telefono, direccion)
 values
 ('Distribuidora La Llanta', '2345-6789', 'San Salvador'),
 ('Lubricantes El Salvador', '2255-9876', 'Santa Tecla'),
@@ -40,7 +40,7 @@ values
 ('Autopartes Express', '2567-1234', 'San Salvador');
 
 -- tabla de categorias 
-insert into categorias (nombre, Descripcion)
+insert into categorias (nombre, descripcion)
 values
 ('Llantas', 'Llantas de diferentes tamaños y tipos para todo tipo de vehículo'),
 ('Aceites y Lubricantes', 'Aceites para motor, transmisión y otros fluidos lubricantes'),
@@ -78,21 +78,24 @@ values
 (10, 10, 'Anticongelante Valvoline 1 galón', 22.00, 55);
 
 -- tabla de vehiculo
-insert into vehiculos (matricula, idCliente, marca, año, modelo, descripcion)
-values
-('P123ABC', 1, 'Toyota', '2020', 'Corolla', 'Sedán color gris, motor 1.8L'),
-('T456XYZ', 2, 'Ford', '2018', 'F-150', 'Pick-up 4x4, color rojo, motor 3.5L');
+INSERT INTO vehiculos (matricula, idCliente, marca, año, modelo, descripcion)
+VALUES ('ABC123', 1, 'Toyota', 2022, 'Corolla', 'Sedan color rojo');
+
+INSERT INTO vehiculos (matricula, idCliente, marca, año, modelo, descripcion)
+VALUES ('XYZ789', 2, 'Honda', 2020, 'Civic', 'Coupe color azul');
+
 
 
 -- tabla reparaciones
 insert into reparaciones(matricula,idServicio,idEmpleado,fechaReparacion,costo)
-values('P123ABC',1,1,now(),150.0),
-('T456XYZ',2,2,now(),200.0);
+values('ABC123',1,1,now(),150.0),
+('XYZ789',2,2,now(),200.0);
 
+select * from reparaciones;
 -- tabla detallereparacion
-insert into detallereparacion(idReparacion,idProducto,CantidadUsada)
-values(1,1,2),
-(2,2,5);
+insert into detallereparacion(idReparacion,idProducto,cantidadUsada)
+values(3,1,2),
+(4,2,5);
 
 
 -- ejemplo de desencriptacion

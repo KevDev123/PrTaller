@@ -1,6 +1,7 @@
 -- PROCEDIMIENTOS ALMACENADOS DE LA BD AUTOCLUTCH
 
 -- PROCEDIMIENTOS ALMACENADOS PARA INSERT
+
 -- Procedimiento para ingresar un cliente
 DELIMITER $$
 create procedure insert_clientes (
@@ -52,7 +53,7 @@ create procedure insert_empleados(
     in v_apellido varchar(30),
     in v_telefono varbinary(255),
     in v_fechaNacimiento date,
-    in v_Direccion varbinary(555)
+    in v_direccion varbinary(555)
 )
 begin
     declare empleado_existente int default 0;
@@ -78,8 +79,8 @@ begin
         -- Iniciar la transacción
         start transaction;
         
-        insert into empleados (nombre, apellido, telefono, fechaNacimiento,Direccion)
-        values (v_nombre, v_apellido, v_telefono,v_fechaNacimiento,v_Direccion);
+        insert into empleados (nombre, apellido, telefono, fechaNacimiento,direccion)
+        values (v_nombre, v_apellido, v_telefono,v_fechaNacimiento,v_direccion);
         
         -- Confirmar la transacción si todo es correcto
         commit;
@@ -94,7 +95,7 @@ DELIMITER ;
 DELIMITER $$
 create procedure insert_servicios(
     in v_nombre varchar(50),
-    in v_Descripcion varchar(100)
+    in v_descripcion varchar(100)
 )
 begin
     declare servicio_existente int default 0;
@@ -120,8 +121,8 @@ begin
         -- Iniciar la transacción
         start transaction;
         
-        insert into servicios (nombre,Descripcion)
-        values (v_nombre,v_Descripcion);
+        insert into servicios (nombre,descripcion)
+        values (v_nombre,v_descripcion);
         
         -- Confirmar la transacción si todo es correcto
         commit;
@@ -136,7 +137,7 @@ DELIMITER ;
 DELIMITER $$
 create procedure insert_categorias(
     in v_nombre varchar(30),
-    in v_Descripcion varchar(100)
+    in v_descripcion varchar(100)
 )
 begin
     declare categoria_existente int default 0;
@@ -162,8 +163,8 @@ begin
         -- Iniciar la transacción
         start transaction;
         
-        insert into categorias (nombre,Descripcion)
-        values (v_nombre,v_Descripcion);
+        insert into categorias (nombre,descripcion)
+        values (v_nombre,v_descripcion);
         
         -- Confirmar la transacción si todo es correcto
         commit;
@@ -178,7 +179,7 @@ DELIMITER ;
 DELIMITER $$
 create procedure insert_proveedores(
     in v_nombreContacto varchar(30),
-    in v_Direccion varbinary(255),
+    in v_direccion varbinary(255),
     in v_telefono varbinary(255)
 )
 begin
@@ -205,8 +206,8 @@ begin
         -- Iniciar la transacción
         start transaction;
         
-        insert into proveedores (nombreContacto,telefono,Direccion)
-        values (v_nombreContacto,v_telefono,v_Direccion);
+        insert into proveedores (nombreContacto,telefono,direccion)
+        values (v_nombreContacto,v_telefono,v_direccion);
         
         -- Confirmar la transacción si todo es correcto
         commit;
@@ -267,7 +268,7 @@ create procedure insert_vehiculos(
     in v_matricula varchar(20),
     in v_idCliente int,
      in v_marca varchar(20),
-     in v_año char(4),
+     in v_año int,
      in v_modelo varchar(20),
      in v_descripcion varchar(50)
 )
@@ -356,20 +357,20 @@ DELIMITER ;
 DELIMITER $$
 create procedure insert_reparacion(
     in v_matricula varchar(20),
-    in v_idservicio int,
-    in v_idempleado int,
-    in v_costomanoobra double,
-    in v_idproducto int,
-    in v_cantidadusada int
+    in v_idServicio int,
+    in v_idEmpleado int,
+    in v_costoManoobra double,
+    in v_idProducto int,
+    in v_cantidadUsada int
 )
 begin
     declare matricula_existente int default 0;
     declare servicio_existente int default 0;
     declare empleado_existente int default 0;
     declare producto_existente int default 0;
-    declare v_costoproducto double default 0;
-    declare v_costototal double default 0;
-    declare idreparacion int default 0;
+    declare v_costoProducto double default 0;
+    declare v_costoTotal double default 0;
+    declare idReparacion int default 0;
     declare producto_precio double default 0;
 
     -- declarar el handler para manejar errores de sql
@@ -396,7 +397,7 @@ begin
         -- verificar que el servicio existe
         select count(*) into servicio_existente
         from servicios 
-        where idservicio = v_idservicio;
+        where idServicio = v_idServicio;
 
         if servicio_existente = 0 then
             select 'error: el servicio no existe' as mensaje;
@@ -406,7 +407,7 @@ begin
         -- verificar que el empleado existe
         select count(*) into empleado_existente
         from empleados 
-        where idempleado = v_idempleado;
+        where idEmpleado = v_idEmpleado;
 
         if empleado_existente = 0 then
             select 'error: el empleado no existe' as mensaje;
@@ -416,7 +417,7 @@ begin
         -- verificar que el producto existe
         select count(*) into producto_existente
         from productos 
-        where idproducto = v_idproducto;
+        where idProducto = v_idProducto;
 
         if producto_existente = 0 then
             select 'error: el producto no existe' as mensaje;
@@ -426,27 +427,27 @@ begin
         -- obtener el precio del producto para calcular el costo total
         select precio into producto_precio
         from productos
-        where idproducto = v_idproducto;
+        where idProducto = v_idProducto;
 
         -- calcular el costo del producto basado en la cantidad usada
-        set v_costoproducto = producto_precio * v_cantidadusada;
+        set v_costoProducto = producto_precio * v_cantidadUsada;
 
         -- sumar el costo de mano de obra y el costo de productos
-        set v_costototal = v_costomanoobra + v_costoproducto;
+        set v_costoTotal = v_costoManoobra + v_costoProducto;
 
         -- iniciar la transacción
         start transaction;
 
         -- insertar la reparación en la tabla reparaciones con el costo total
-        insert into reparaciones (matricula, idservicio, idempleado, fechareparacion, costo)
-        values (v_matricula, v_idservicio, v_idempleado, now(), v_costototal);
+        insert into reparaciones (matricula, idServicio, idEmpleado, fechareparacion, costo)
+        values (v_matricula, v_idServicio, v_idEmpleado, now(), v_costototal);
 
         -- obtener el id de la reparación insertada
-        set idreparacion = last_insert_id();
+        set idReparacion = last_insert_id();
 
         -- insertar el detalle de la reparación en la tabla detallereparacion
-        insert into detallereparacion (idreparacion, idproducto, cantidadusada)
-        values (idreparacion, v_idproducto, v_cantidadusada);
+        insert into detallereparacion (idReparacion, idProducto, cantidadusada)
+        values (idReparacion, v_idProducto, v_cantidadusada);
 
         -- confirmar la transacción si todo es correcto
         commit;
@@ -516,7 +517,7 @@ create procedure update_empleados(
     in v_apellido varchar(30),
     in v_telefono varbinary(255),
     in v_fechaNacimiento date,
-    in v_Direccion varbinary(555)
+    in v_direccion varbinary(555)
 )
 begin
     declare empleado_existente int default 0;
@@ -543,7 +544,7 @@ begin
         start transaction;
         
         update empleados set nombre = v_nombre , apellido = v_apellido , telefono = v_telefono,
-        fechaNacimiento = v_fechaNacimiento, Direccion = v_Direccion
+        fechaNacimiento = v_fechaNacimiento, direccion = v_direccion
         where idEmpleado = v_idEmpleado;
         
         -- Confirmar la transacción si todo es correcto
@@ -559,7 +560,7 @@ DELIMITER $$
 create procedure update_servicios(
     in v_idServicio int,
     in v_nombre varchar(50),
-    in v_Descripcion varchar(100)
+    in v_descripcion varchar(100)
 )
 begin
     declare servicio_existente int default 0;
@@ -585,7 +586,7 @@ begin
         -- Iniciar la transacción
         start transaction;
         
-        update servicios set nombre = v_nombre, Descripcion = v_Descripcion
+        update servicios set nombre = v_nombre, descripcion = v_descripcion
         where idServicio = v_idServicio;
         
         -- Confirmar la transacción si todo es correcto
@@ -601,7 +602,7 @@ DELIMITER $$
 create procedure update_categorias(
     in v_idCategoria int,
     in v_nombre varchar(30),
-    in v_Descripcion varchar(100)
+    in v_descripcion varchar(100)
 )
 begin
     declare categoria_existente int default 0;
@@ -627,7 +628,7 @@ begin
         -- Iniciar la transacción
         start transaction;
         
-        update categorias set nombre = v_nombre , Descripcion = v_Descripcion
+        update categorias set nombre = v_nombre , descripcion = v_descripcion
         where idCategoria = v_idCategoria;
         
         -- Confirmar la transacción si todo es correcto
@@ -645,7 +646,7 @@ DELIMITER $$
 create procedure update_proveedores(
     in v_idProveedor int,
     in v_nombreContacto varchar(30),
-    in v_Direccion varbinary(255),
+    in v_direccion varbinary(255),
     in v_telefono varbinary(255)
 )
 begin
@@ -672,7 +673,7 @@ begin
         -- Iniciar la transacción
         start transaction;
         
-        update proveedores set nombreContacto = v_nombreContacto, telefono = v_telefono, Direccion = v_Direccion
+        update proveedores set nombreContacto = v_nombreContacto, telefono = v_telefono, direccion = v_direccion
         where idProveedor = v_idProveedor;
         
         -- Confirmar la transacción si todo es correcto
@@ -731,7 +732,7 @@ create procedure update_vehiculos(
     in v_matricula varchar(20),
     in v_idCliente int,
      in v_marca varchar(20),
-     in v_año char(4),
+     in v_año int,
      in v_modelo varchar(20),
      in v_descripcion varchar(50)
 )
@@ -820,7 +821,7 @@ DELIMITER ;
 
 
 -- Procedimiento para actualizar las reparaciones
-delimiter $$
+DELIMITER $$
 
 create procedure update_reparacion (
     in v_idReparacion int, 
@@ -830,7 +831,7 @@ create procedure update_reparacion (
     in v_fechaReparacion datetime,
     in v_costo double,
     in v_idProducto int,
-    in v_CantidadUsada int
+    in v_cantidadUsada int
 )
 begin
     declare reparacion_existente int default 0;
@@ -867,7 +868,7 @@ begin
         -- Actualizar el detalle de la reparación en la tabla detallereparacion
         update detallereparacion 
         set idProducto = v_idProducto, 
-            CantidadUsada = v_CantidadUsada
+            cantidadUsada = v_cantidadUsada
         where idReparacion = v_idReparacion
           and idProducto = v_idProducto;
 
@@ -878,7 +879,7 @@ begin
     end if;
 end $$
 
-delimiter ;
+DELIMITER ;
 
 -- PROCEDIMIENTOS ALMACENADOS PARA DELETE
 -- Procedimiento para eliminar un cliente
@@ -1160,7 +1161,7 @@ end $$
 DELIMITER ;
 
 -- PROCEDIMIENTOS ALMACENADOS PARA FILTRO DE DATOS
-delimiter $$
+DELIMITER $$
 
 -- Filtrado de clientes
 create procedure filtradoClientes(
@@ -1195,10 +1196,10 @@ begin
 
 end$$
 
-delimiter ;
+DELIMITER ;
 
 -- Filtrado de empleados
-delimiter $$
+DELIMITER $$
 create procedure filtradoEmpleados(
     in filtro varchar(50),
     in tipUsuario varchar(20)
@@ -1231,11 +1232,11 @@ begin
 
 end$$
 
-delimiter ;
+DELIMITER ;
 
 
 -- Filtrado de proveedores 
-delimiter $$
+DELIMITER $$
 create procedure filtradoProveedores(
     in filtro varchar(50),
     in tipUsuario varchar(20)
@@ -1268,11 +1269,11 @@ begin
 
 end$$
 
-delimiter ;
+DELIMITER ;
 
 
 -- Filtrado de servicios 
-delimiter $$
+DELIMITER $$
 create procedure filtradoServicios(
     in filtro varchar(50),
     in tipUsuario varchar(20)
@@ -1302,10 +1303,10 @@ begin
 
 end$$
 
-delimiter ;
+DELIMITER ;
 
 -- Filtrado de vehiculos
-delimiter $$
+DELIMITER $$
 create procedure filtradoVehiculos(
     in filtro varchar(50),
     in tipUsuario varchar(20)
@@ -1335,11 +1336,11 @@ begin
 
 end$$
 
-delimiter ;
+DELIMITER ;
 
 
 -- Filtrado de productos
-delimiter $$
+DELIMITER $$
 create procedure filtradoProductos(
     in filtro varchar(50),
     in tipUsuario varchar(20)
@@ -1369,11 +1370,11 @@ begin
 
 end$$
 
-delimiter ;
+DELIMITER ;
 
 
 -- Filtrado de categorias
-delimiter $$
+DELIMITER $$
 create procedure filtradoCategorias(
     in filtro varchar(50),
     in tipUsuario varchar(20)
@@ -1402,12 +1403,11 @@ begin
     end if;
 
 end$$
-
-delimiter ;
+DELIMITER ;
 
 
 -- Filtrado de reparaciones
-delimiter $$
+DELIMITER $$
 create procedure filtradoReparaciones(
     in filtro varchar(50),
     in tipUsuario varchar(20)
@@ -1438,5 +1438,5 @@ begin
 
 end$$
 
-delimiter ;
+DELIMITER ;
 

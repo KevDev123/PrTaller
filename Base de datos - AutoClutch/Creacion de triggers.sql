@@ -60,7 +60,7 @@ before insert on empleados
 for each row
 begin 
      set new.telefono = aes_encrypt(new.telefono,'@auto');
-     set new.Direccion = aes_encrypt(new.Direccion,'@auto');
+     set new.direccion = aes_encrypt(new.direccion,'@auto');
 end$$
 
 delimiter ;
@@ -74,24 +74,24 @@ before update on empleados
 for each row
 begin 
      set new.telefono = aes_encrypt(new.telefono,'@auto');
-     set new.Direccion = aes_encrypt(new.Direccion,'@auto');
+     set new.direccion = aes_encrypt(new.direccion,'@auto');
 end$$
 
 delimiter ;
 
 
 -- trigger para eliminar stock de productos
-DELIMITER $$
+delimiter $$
 
 create trigger menosStock
 after insert on detalleReparacion
 for each row
 begin
-   -- Actualizar el stock del producto utilizado en la reparación
+
    update productos 
-   set stock = stock - new.CantidadUsada
+   set stock = stock - new.cantidadUsada
    where idProducto = new.idProducto;
 
 end$$
 
-DELIMITER ;
+delimiter ;
